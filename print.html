@@ -86,17 +86,24 @@
             color: #000;
             line-height: 1.05;
         }
+        
+        /* ⬇️ INI BAGIAN YANG DIUBAH (JUDUL KOLOM / HEADER) ⬇️ */
         th {
             background: #fff !important;
             color: #000 !important;
-            font-weight: bold;
+            font-weight: 900; /* Tebal */
             font-size: 7.5pt;
-            text-align: center !important;
-            padding: 2.5px 2.5px;
+            text-align: center !important;       /* Tengah horizontal */
+            vertical-align: middle !important;   /* Tengah vertikal (Baru) */
+            padding: 6px 2.5px !important;       /* Padding atas-bawah dilegakan (Baru) */
+            letter-spacing: 0.3px;
         }
-        .no-col { width: 5%; text-align: center; font-weight: 900; }
-        .tgl-col { width: 18%; font-weight: 900; color: #000; }
-        .nama-col { width: 27%; }
+        /* ⬆️ AKHIR BAGIAN YANG DIUBAH ⬆️ */
+
+        /* Lebar Kolom */
+        .no-col { width: 6%; text-align: center; font-weight: 900; }
+        .tgl-col { width: 19%; font-weight: 900; color: #000; }
+        .nama-col { width: 25%; }
         .nama-col-kediaman { width: 25%; }
         .nama-col-makodim { width: 25%; }
 
@@ -245,11 +252,11 @@
         <table>
             <thead>
                 <tr>
-                    <th class="no-col" style="text-align:center !important;">NO</th>
-                    <th class="tgl-col" style="text-align:center !important;">TANGGAL</th>
-                    <th class="nama-col" style="text-align:center !important;">KORAMIL</th>
-                    <th class="nama-col-kediaman" style="text-align:center !important;">KEDIAMAN</th>
-                    <th class="nama-col-makodim" style="text-align:center !important;">MAKODIM</th>
+                    <th class="no-col">NO</th>
+                    <th class="tgl-col">TANGGAL</th>
+                    <th class="nama-col">KORAMIL</th>
+                    <th class="nama-col-kediaman">KEDIAMAN</th>
+                    <th class="nama-col-makodim">MAKODIM</th>
                 </tr>
             </thead>
             <tbody id="tbodyPrint">
@@ -361,6 +368,8 @@
                     const p = dateKey.split('-');
                     const d = new Date(p[0], p[1] - 1, p[2]);
                     const dateStr = formatTanggalDuaBaris(d);
+                    
+                    // Note: Baris di bawah ini TETAP seperti yang sudah ada (kiri untuk nama)
                     html += `
                         <tr>
                             <td class="no-col">${index + 1}</td>
