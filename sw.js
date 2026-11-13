@@ -3,12 +3,40 @@
 //  KORAMIL 1609-05/SUKASADA
 // ============================================================
 
-const CACHE_NAME = 'hanpangan-v6';
+const CACHE_NAME = 'hanpangan-v7';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
+
+// Apply formal A4 typography to the app's print stylesheet and its
+// separately generated print document in cetakJadwal().
+async function applyPrintTypography(response) {
+  const html = await response.text();
+  const printStyles = `
+    @page { size: A4; }
+    @media print {
+      html, body, table, td, .print-note, .signature-box {
+        font-family: Arial, sans-serif !important;
+        font-size: 12pt !important;
+      }
+      th, .kop .kodim, .kop .koramil, .judul, .signature-title {
+        font-family: Arial, sans-serif !important;
+        font-size: 11pt !important;
+      }
+    }
+  `;
+  const transformedHtml = html.replace(/<\/style>/gi, printStyles + '</style>');
+  const headers = new Headers(response.headers);
+  headers.delete('content-length');
+  headers.delete('content-encoding');
+  return new Response(transformedHtml, {
+    status: response.status,
+    statusText: response.statusText,
+    headers
+  });
+}
 
 // ============================================================
 //  INSTALL - Cache asset utama
@@ -67,6 +95,11 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
+  const requestUrl = new URL(event.request.url);
+  const isAppPage = event.request.mode === 'navigate' ||
+    requestUrl.pathname.endsWith('/index.html') ||
+    requestUrl.pathname.endsWith('/');
+
   event.respondWith(
     caches.match(event.request)
       .then(function(cachedResponse) {
@@ -101,6 +134,9 @@ self.addEventListener('fetch', function(event) {
               statusText: 'Service Unavailable'
             });
           });
+      })
+      .then(function(response) {
+        return isAppPage && response.ok ? applyPrintTypography(response) : response;
       })
   );
 });
