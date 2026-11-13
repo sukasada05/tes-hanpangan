@@ -3,17 +3,21 @@
 //  KORAMIL 1609-05/SUKASADA
 // ============================================================
 
-const CACHE_NAME = 'hanpangan-v7';
+const CACHE_NAME = 'hanpangan-v8';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// Apply formal A4 typography to the app's print stylesheet and its
-// separately generated print document in cetakJadwal().
-async function applyPrintTypography(response) {
+// Original public Supabase anon key for this project. The index.html
+// temporarily contained an invalid replacement, causing Supabase 401s.
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhdXNmc2ZsY2VoaXpwdXFkd2JnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTA3ODQsImV4cCI6MjA5ODY2Njc5NH0.2zF7iogzuTwWoQc451-uKxQdNN1C-qkB0O9Jvz1ZoI0';
+const INVALID_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhdXNmc2ZsY2VoaXpwdXFkd2JnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTA3ODQsImV4cCI6MjA5ODYxNjYwNiwidWFjIjoic3VwYWJhc2UuYW5vbiJ9.owwZ52q9GgqW7B8s7d8fXfFUMYHW8K8Jf5sP9cK4y3g';
+
+async function transformAppResponse(response) {
   const html = await response.text();
+  const withValidSupabaseKey = html.replace(INVALID_SUPABASE_ANON_KEY, SUPABASE_ANON_KEY);
   const printStyles = `
     @page { size: A4; }
     @media print {
@@ -27,7 +31,7 @@ async function applyPrintTypography(response) {
       }
     }
   `;
-  const transformedHtml = html.replace(/<\/style>/gi, printStyles + '</style>');
+  const transformedHtml = withValidSupabaseKey.replace(/<\/style>/gi, printStyles + '</style>');
   const headers = new Headers(response.headers);
   headers.delete('content-length');
   headers.delete('content-encoding');
@@ -136,7 +140,7 @@ self.addEventListener('fetch', function(event) {
           });
       })
       .then(function(response) {
-        return isAppPage && response.ok ? applyPrintTypography(response) : response;
+        return isAppPage && response.ok ? transformAppResponse(response) : response;
       })
   );
 });
