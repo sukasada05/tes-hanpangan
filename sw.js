@@ -3,44 +3,12 @@
 //  KORAMIL 1609-05/SUKASADA
 // ============================================================
 
-const CACHE_NAME = 'hanpangan-v8';
+const CACHE_NAME = 'hanpangan-v6';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
-
-// Original public Supabase anon key for this project. The index.html
-// temporarily contained an invalid replacement, causing Supabase 401s.
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhdXNmc2ZsY2VoaXpwdXFkd2JnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTA3ODQsImV4cCI6MjA5ODY2Njc5NH0.2zF7iogzuTwWoQc451-uKxQdNN1C-qkB0O9Jvz1ZoI0';
-const INVALID_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndhdXNmc2ZsY2VoaXpwdXFkd2JnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxMTA3ODQsImV4cCI6MjA5ODYxNjYwNiwidWFjIjoic3VwYWJhc2UuYW5vbiJ9.owwZ52q9GgqW7B8s7d8fXfFUMYHW8K8Jf5sP9cK4y3g';
-
-async function transformAppResponse(response) {
-  const html = await response.text();
-  const withValidSupabaseKey = html.replace(INVALID_SUPABASE_ANON_KEY, SUPABASE_ANON_KEY);
-  const printStyles = `
-    @page { size: A4; }
-    @media print {
-      html, body, table, td, .print-note, .signature-box {
-        font-family: Arial, sans-serif !important;
-        font-size: 12pt !important;
-      }
-      th, .kop .kodim, .kop .koramil, .judul, .signature-title {
-        font-family: Arial, sans-serif !important;
-        font-size: 11pt !important;
-      }
-    }
-  `;
-  const transformedHtml = withValidSupabaseKey.replace(/<\/style>/gi, printStyles + '</style>');
-  const headers = new Headers(response.headers);
-  headers.delete('content-length');
-  headers.delete('content-encoding');
-  return new Response(transformedHtml, {
-    status: response.status,
-    statusText: response.statusText,
-    headers
-  });
-}
 
 // ============================================================
 //  INSTALL - Cache asset utama
@@ -99,11 +67,6 @@ self.addEventListener('fetch', function(event) {
     return;
   }
 
-  const requestUrl = new URL(event.request.url);
-  const isAppPage = event.request.mode === 'navigate' ||
-    requestUrl.pathname.endsWith('/index.html') ||
-    requestUrl.pathname.endsWith('/');
-
   event.respondWith(
     caches.match(event.request)
       .then(function(cachedResponse) {
@@ -138,9 +101,6 @@ self.addEventListener('fetch', function(event) {
               statusText: 'Service Unavailable'
             });
           });
-      })
-      .then(function(response) {
-        return isAppPage && response.ok ? transformAppResponse(response) : response;
       })
   );
 });
