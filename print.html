@@ -11,12 +11,6 @@
            ============================================================ */
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        :root {
-            --print-font-size: 7.5pt;
-            --print-line-height: 1.1;
-            --print-cell-padding: 1.5px 3px;
-        }
-
         html, body {
             margin: 0;
             padding: 0;
@@ -38,36 +32,37 @@
             line-height: 1.15;
         }
 
-        /* ====== KOP SURAT ====== */
+        /* ====== KOP SURAT (font kecil + garis pas) ====== */
         .kop {
             text-align: left;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
         .kop-wrapper {
             display: inline-block;
             border-bottom: 2px solid #000;
-            padding-bottom: 3px;
+            padding-bottom: 2px;
         }
         .kop .kodim, .kop .koramil {
             font-weight: 900;
-            font-size: 10.5pt;
+            font-size: 8.5pt;
             text-transform: uppercase;
             line-height: 1.1;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.2px;
             color: #000;
         }
         .kop .koramil {
-            margin-left: 25px;
-            margin-top: 2px;
+            margin-left: 0;
+            text-indent: 22px;
+            margin-top: 1px;
         }
 
         /* ====== JUDUL ====== */
         .judul {
             text-align: center;
             font-weight: bold;
-            font-size: 9.5pt;
+            font-size: 8.5pt;
             text-transform: uppercase;
-            margin: 6px 0 5px;
+            margin: 5px 0 4px;
             color: #000;
         }
 
@@ -76,28 +71,28 @@
             width: 100%;
             border-collapse: collapse;
             font-family: Arial, sans-serif;
-            font-size: var(--print-font-size);
+            font-size: 7pt;
             border: 1px solid #000;
             table-layout: fixed;
         }
         th, td {
             border: 1px solid #000;
-            padding: var(--print-cell-padding);
+            padding: 1px 2.5px;
             text-align: left;
             vertical-align: top;
             word-break: normal;
             overflow-wrap: break-word;
             white-space: pre-line;
             color: #000;
-            line-height: var(--print-line-height);
+            line-height: 1.05;
         }
         th {
             background: #fff !important;
             color: #000 !important;
             font-weight: bold;
-            font-size: 8pt;
+            font-size: 7.5pt;
             text-align: center !important;
-            padding: 3px 3px;
+            padding: 2.5px 2.5px;
         }
         .no-col { width: 5%; text-align: center; font-weight: 900; }
         .tgl-col { width: 18%; font-weight: 900; color: #000; }
@@ -111,10 +106,10 @@
             justify-content: space-between;
             align-items: flex-start;
             gap: 24px;
-            margin-top: 12px;
+            margin-top: 10px;
             color: #000;
             font-family: Arial, sans-serif;
-            font-size: 8pt;
+            font-size: 7.5pt;
             break-inside: avoid;
             page-break-inside: avoid;
         }
@@ -124,22 +119,22 @@
             max-width: 55%;
         }
         .signature-block .ttd {
-            min-width: 220px;
+            min-width: 200px;
             text-align: center;
         }
         .signature-block .ttd .heading {
             font-weight: bold;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
         }
         .signature-block .ttd .jabatan {
             font-weight: bold;
             margin-top: 1px;
         }
         .signature-block .ttd .space {
-            height: 55px;
+            height: 45px;
         }
         .signature-block .ttd .line {
-            width: 190px;
+            width: 175px;
             margin: 0 auto;
             border-top: 1px solid #000;
         }
@@ -393,7 +388,7 @@
                     if (autoPrint) {
                         setTimeout(() => {
                             window.print();
-                        }, 400);
+                        }, 600);
                     }
                 } catch (e) {
                     console.error('❌ Gagal render:', e);
