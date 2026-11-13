@@ -3,7 +3,7 @@
 //  KORAMIL 1609-05/SUKASADA
 // ============================================================
 
-const CACHE_NAME = 'hanpangan-v5';   // ← diubah dari 'hanpangan-v4' ke 'hanpangan-v5'
+const CACHE_NAME = 'hanpangan-v6';   // ← dari v5 ke v6
 const urlsToCache = [
   './',
   './index.html',
