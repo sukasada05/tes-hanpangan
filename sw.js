@@ -3,12 +3,33 @@
 //  KORAMIL 1609-05/SUKASADA
 // ============================================================
 
-const CACHE_NAME = 'hanpangan-v4';
+const CACHE_NAME = 'hanpangan-v5';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
+
+// Tambahkan catatan dan area tanda tangan di bagian akhir dokumen cetak.
+async function addPrintSignature(response) {
+  const html = await response.text();
+  const signatureBlock = `</table>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-top:24px;break-inside:avoid;page-break-inside:avoid;color:#000;font-family:Arial,sans-serif;font-size:10pt;">
+  <div style="font-weight:bold;">Catatan : Jadwal Ini sewaktu waktu bisa berubah</div>
+  <div style="min-width:220px;text-align:center;">
+    <div style="font-weight:bold;text-transform:uppercase;">TANDA TANGAN</div>
+    <div style="height:80px;"></div>
+    <div style="width:180px;margin:0 auto;border-top:1px solid #000;"></div>
+  </div>
+</div>
+</table>`;
+  const transformedHtml = html.replace(/<\/table>(\s*)<\/body>(\s*)<\/html>/i, signatureBlock + '$1</body>$2</html>');
+  return new Response(transformedHtml, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers
+  });
+}
 
 // ============================================================
 //  INSTALL - Cache asset utama
@@ -70,37 +91,38 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request)
       .then(function(cachedResponse) {
-        if (cachedResponse) {
-          console.log('📦 Serving from cache:', event.request.url);
-          return cachedResponse;
-        }
+        const responsePromise = cachedResponse
+          ? Promise.resolve(cachedResponse)
+          : fetch(event.request).then(function(response) {
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
 
-        return fetch(event.request)
-          .then(function(response) {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then(function(cache) {
+                  try {
+                    cache.put(event.request, responseToCache);
+                    console.log('💾 Cached:', event.request.url);
+                  } catch (error) {
+                    console.warn('⚠️ Failed to cache:', event.request.url, error);
+                  }
+                });
+
               return response;
-            }
-
-            var responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                try {
-                  cache.put(event.request, responseToCache);
-                  console.log('💾 Cached:', event.request.url);
-                } catch (error) {
-                  console.warn('⚠️ Failed to cache:', event.request.url, error);
-                }
-              });
-
-            return response;
-          })
-          .catch(function(error) {
-            console.warn('⚠️ Network request failed:', event.request.url, error);
-            return new Response('Network Error', {
-              status: 503,
-              statusText: 'Service Unavailable'
             });
+
+        return responsePromise.then(function(response) {
+          const isAppPage = event.request.mode === 'navigate' ||
+            new URL(event.request.url).pathname.endsWith('/index.html');
+          return isAppPage ? addPrintSignature(response) : response;
+        }).catch(function(error) {
+          console.warn('⚠️ Network request failed:', event.request.url, error);
+          return new Response('Network Error', {
+            status: 503,
+            statusText: 'Service Unavailable'
           });
+        });
       })
   );
 });
